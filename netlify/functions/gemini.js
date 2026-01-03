@@ -1,5 +1,4 @@
-// netlify/functions/gemini.js
-// Calls Gemini using API v1 (recommended). Keeps API key on serverless function.
+// netlify/functions/gemini.js  (CommonJS - works reliably on Netlify)
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -7,7 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-export async function handler(event) {
+exports.handler = async (event) => {
   if (event.httpMethod === "OPTIONS") {
     return { statusCode: 200, headers: corsHeaders, body: "" };
   }
@@ -32,9 +31,6 @@ export async function handler(event) {
     }
 
     const apiKey = process.env.GEMINI_API_KEY;
-
-    // Use a model that exists on v1
-    // (You can override via env GEMINI_MODEL)
     const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
     if (!apiKey) {
@@ -42,29 +38,26 @@ export async function handler(event) {
         statusCode: 500,
         headers: corsHeaders,
         body: JSON.stringify({
-          error:
-            "Missing GEMINI_API_KEY. Add it to Netlify Environment Variables (or to .env for local netlify dev).",
+          error: "Missing GEMINI_API_KEY in Netlify environment variables.",
         }),
       };
     }
 
-    // Humor + firmeza (sem humilhar / xingar)
     const systemStyle = `
 Você é um Coach bem-humorado, direto e firme para uma mãe ansiosa e superprotetora.
 
 Regras IMPORTANTES:
-- Pode usar humor leve e ironia gentil, mas NUNCA humilhar, ofender ou xingar.
+- Humor leve e ironia gentil, mas NUNCA humilhar, ofender ou xingar.
 - Confronte com clareza vitimismo, catastrofização, culpa e medo excessivo, com respeito.
 - Faça apenas UMA pergunta curta por resposta.
 - Dê UMA micro-ação prática de 5 minutos.
 - Linguagem simples e objetiva.
 - Não dê diagnósticos; não substitui terapia.
 - Ajude a separar: "perigo real" vs "preocupação imaginada".
-- Incentive limites saudáveis com os filhos e autocuidado sem culpa.
+- Incentive limites saudáveis e autocuidado sem culpa.
 - Finalize com: "🛡️ Modo Coragem: ON"
 `;
 
-    // Gemini "contents"
     const contents = [
       {
         role: "user",
@@ -77,7 +70,6 @@ Regras IMPORTANTES:
       { role: "user", parts: [{ text: message }] },
     ];
 
-    // IMPORTANT: use v1 (not v1beta)
     const url = `https://generativelanguage.googleapis.com/v1/models/${encodeURIComponent(
       model
     )}:generateContent?key=${encodeURIComponent(apiKey)}`;
@@ -87,10 +79,7 @@ Regras IMPORTANTES:
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         contents,
-        generationConfig: {
-          temperature: 0.85,
-          maxOutputTokens: 900,
-        },
+        generationConfig: { temperature: 0.85, maxOutputTokens: 900 },
       }),
     });
 
@@ -104,7 +93,6 @@ Regras IMPORTANTES:
           error: "Gemini API error",
           details: raw,
           usedModel: model,
-          apiVersion: "v1",
         }),
       };
     }
@@ -112,7 +100,7 @@ Regras IMPORTANTES:
     const data = JSON.parse(raw);
     const text =
       data?.candidates?.[0]?.content?.parts?.map((p) => p.text).join("") ||
-      "Tive um branco 😅 tenta de novo em uma frase.\n\n🛡️ Modo Coragem: ON";
+      "Tive um branco 😅 tenta de novo.\n\n🛡️ Modo Coragem: ON";
 
     return {
       statusCode: 200,
@@ -126,4 +114,4 @@ Regras IMPORTANTES:
       body: JSON.stringify({ error: "Function failed." }),
     };
   }
-}
+};
