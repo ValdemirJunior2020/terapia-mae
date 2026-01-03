@@ -6,18 +6,28 @@ import VideoLogo from "./components/VideoLogo";
 
 export default function App() {
   const [unlocked, setUnlocked] = useState(false);
+  const [playMusic, setPlayMusic] = useState(false);
+
+  function handleUnlock() {
+    setUnlocked(true);
+    setPlayMusic(true); // 🎵 música começa aqui
+  }
 
   return (
     <div className="app-shell">
-      <VideoLogo />
+      <VideoLogo playMusic={playMusic} />
 
       <HeaderBar
         title="MAE TERAPIA 😄"
-        subtitle={unlocked ? "Coach bem-humorado e firme" : "Desbloqueie o portão primeiro"}
+        subtitle={
+          unlocked
+            ? "Coach bem-humorado e firme"
+            : "Desbloqueie o portão primeiro"
+        }
       />
 
       {!unlocked ? (
-        <Gate onUnlocked={() => setUnlocked(true)} />
+        <Gate onUnlocked={handleUnlock} />
       ) : (
         <ChatCoach userName="Mãe" />
       )}
