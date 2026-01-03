@@ -36,3 +36,39 @@
     transform: rotate(360deg);
   }
 }
+/* ===== VIDEO LOGO (TOP BANNER) ===== */
+
+.video-logo-container {
+  width: 100%;
+  max-width: 420px;      /* NÃO deixa virar gigante */
+  margin: 0 auto 16px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.video-logo {
+  width: 100%;
+  height: 120px;        /* ALTURA CONTROLADA */
+  object-fit: cover;    /* corta sem distorcer */
+  display: block;
+}
+
+/* Tablets */
+@media (min-width: 768px) {
+  .video-logo {
+    height: 150px;
+  }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .video-logo-container {
+    max-width: 480px;
+  }
+
+  .video-logo {
+    height: 170px;
+  }
+}

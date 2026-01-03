@@ -1,25 +1,26 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import HeaderBar from "./components/HeaderBar";
+import Gate from "./components/Gate";
+import ChatCoach from "./components/ChatCoach";
+import VideoLogo from "./components/VideoLogo";
 
-function App() {
+export default function App() {
+  const [unlocked, setUnlocked] = useState(false);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="app-shell">
+      <VideoLogo />
+
+      <HeaderBar
+        title="MAE TERAPIA 😄"
+        subtitle={unlocked ? "Coach bem-humorado e firme" : "Desbloqueie o portão primeiro"}
+      />
+
+      {!unlocked ? (
+        <Gate onUnlocked={() => setUnlocked(true)} />
+      ) : (
+        <ChatCoach userName="Mãe" />
+      )}
     </div>
   );
 }
-
-export default App;
